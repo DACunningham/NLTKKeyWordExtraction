@@ -37,6 +37,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="requirements.txt" />
+    <Content Include="resources\doc1.txt" />
+    <Content Include="resources\doc2.txt" />
+    <Content Include="resources\doc3.txt" />
+    <Content Include="resources\doc4.txt" />
+    <Content Include="resources\doc5.txt" />
+    <Content Include="resources\doc6.txt" />
     <Content Include="resources\stopwords.txt" />
   </ItemGroup>
   <ItemGroup>
