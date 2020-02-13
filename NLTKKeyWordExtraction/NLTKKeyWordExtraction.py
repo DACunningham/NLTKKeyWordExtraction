@@ -141,53 +141,75 @@ Thank you, and God Bless the United States of America.
 
 import re
 
-
+import nltk
+import pandas as pd
 from nltk.stem import WordNetLemmatizer
-nltk.download('wordnet')
+from nltk.stem import PorterStemmer
+from nltk.tokenize.stanford import StanfordTokenizer
+import numpy as np 
 
-# init lemmatizer
-lemmatizer = WordNetLemmatizer()
+def scrub_words(text):
+    """Basic cleaning of texts."""
+
+    #remove non-ascii and digits
+    #text=re.sub("(\\W|\\d)","",text)
+    #print(text)
+    #split into words
+    #from nltk.tokenize import word_tokenize
+    #words = word_tokenize(text)
+    words = re.split(r'\W+|\d', text)
+    # Lower case
+    words = [w.lower() for w in words]
+    # remove punctuation from each word
+    #import string
+    #table = str.maketrans('', '', string.punctuation)
+    #words = [w.translate(table) for w in words]
+
+    # filter out stop words
+    from nltk.corpus import stopwords
+    stop_words = set(stopwords.words("english"))
+    file = open("resources/stopwords.txt", 'rt')
+    fileText = file.read()
+    file.close()
+    #fileText = fileText.split()
+    #stop_words.union(fileText)
+    stop_words = fileText
+    words = [w for w in words if not w in stop_words]
+    print(len(words))
+    #remove whitespace
+    #words = words.strip()
+    return words
+
+def lemmatizeWords(tokens):
+    # init lemmatizer
+    lemmatizer = WordNetLemmatizer()
+    #lemmatize trouble variations
+    lemmatized_words=[lemmatizer.lemmatize(word=word,pos='v') for word in tokens]
+    #cleaned_stemmed_words=[porter_stemmer.stem(word=word) for word in cleaned_words]
+    print(lemmatized_words)
+    print(len(lemmatized_words))
+    return lemmatized_words
 
 
-def pre_process(text):
-    
-    # lowercase
-    text=text.lower()
-    
-    #remove tags
-    text=re.sub("</?.*?>"," <> ",text)
-    
-    # remove special characters and digits
-    text=re.sub("(\\d|\\W)+"," ",text)
-    
-    return text
+cleaned_words1 = scrub_words(article1)
+lemmatized_words1 = lemmatizeWords(cleaned_words1)
 
-processedArticle1 = pre_process(article1)
-processedArticle2 = pre_process(article2)
-
-#print(processedArticle)
+cleaned_words2 = scrub_words(article2)
+lemmatized_words2 = lemmatizeWords(cleaned_words2)
 
 
 from sklearn.feature_extraction.text import CountVectorizer
 
-def get_stop_words(stop_file_path):
-    """load stop words """
-    
-    with open(stop_file_path, 'r', encoding="utf-8") as f:
-        stopwords = f.readlines()
-        stop_set = set(m.strip() for m in stopwords)
-        return frozenset(stop_set)
-
-#load a set of stop words
-stopwords=get_stop_words("resources/stopwords.txt")
-
-#get the text column 
-docs=[processedArticle1, processedArticle2]
+##get the text column 
+#docs=[processedArticle1, processedArticle2]
+lemmatized_words1 = " ".join(lemmatized_words1)
+lemmatized_words2 = " ".join(lemmatized_words2)
+docs = [lemmatized_words1, lemmatized_words2]
 
 #create a vocabulary of words, 
 #ignore words that appear in 85% of documents, 
 #eliminate stop words
-cv=CountVectorizer(max_df=0.85,min_df=0.10,stop_words=stopwords,max_features=10000)
+cv=CountVectorizer(max_df=0.85,min_df=0.10,max_features=10000)
 word_count_vector=cv.fit_transform(docs)
 
 print(word_count_vector.shape)
