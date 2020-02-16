@@ -1,6 +1,7 @@
 from FileIO import FileIO
 from TextProcessor import TextProcessor
 from KeyWordExtractor import KeyWordExtractor
+#from NLTKKeyWordExtraction import Term
 import nltk
 
 ###########################
@@ -105,13 +106,50 @@ document_sentences["doc4"] = text_processor.convert_to_sentences(files.documentL
 document_sentences["doc5"] = text_processor.convert_to_sentences(files.documentLibrary[4])
 document_sentences["doc6"] = text_processor.convert_to_sentences(files.documentLibrary[5])
 
+
+class Term(object):
+    """Holds information relating to terms found in documents"""
+
+    def __init__(self, _term, term_count, *args, **kwargs):
+        self.term = _term
+        self.total_term_count = term_count
+        self.term_in_documents = []
+        self.term_in_sentences = []
+        return super().__init__(*args, **kwargs)
+
+
+
+
+
+
+terms = []
+
 for term in sorted_weight:
-    print(term)
+    #print(term)
+    temp_term = Term(term[0], term[1])
     for key in document_sentences:
-        print(key)
+        #print(key)
+        term_count_in_document = 0
         for sentence in document_sentences[key]:
             if term[0] in sentence.casefold():
-                print(sentence)
+                temp_term.term_in_sentences.append(sentence)
+                term_count_in_document += 1
+                if term_count_in_document == 1:
+                    temp_term.term_in_documents.append(key)
+                #print(sentence)
+    terms.append(temp_term)
+
+
+print("----------------------------------------")
+
+print(terms[0].term)
+print(terms[0].total_term_count)
+print(terms[0].term_in_documents)
+print(terms[0].term_in_sentences)
+
+
+
+
 
 ## you only needs to do this once
 #feature_names=cv.get_feature_names()
