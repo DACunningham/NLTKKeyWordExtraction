@@ -26,7 +26,7 @@ class TextProcessor(object):
     def remove_stopwords(self, words):
         # filter out stop words
         file_io = FileIO()
-        stop_words = file_io.loadTextFile(self.STOP_WORD_LOCATION)
+        stop_words = file_io.load_text_file(self.STOP_WORD_LOCATION)
         words = [w for w in words if not w in stop_words]
         return words
 

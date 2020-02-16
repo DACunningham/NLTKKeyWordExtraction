@@ -1,31 +1,29 @@
 from FileIO import FileIO
 from TextProcessor import TextProcessor
 from KeyWordExtractor import KeyWordExtractor
-#from NLTKKeyWordExtraction import Term
-import nltk
+import re
 
 ###########################
 # Logic starts here
 filePaths = ["resources/doc1.txt", "resources/doc2.txt", "resources/doc3.txt", 
              "resources/doc4.txt", "resources/doc5.txt", "resources/doc6.txt" ]
-#documentLibrary = []
+documentLibrary = []
 processedDocLibrary = []
 
-files = FileIO()
-files.load_all_files(filePaths)
+file_io = FileIO()
+documentLibrary = file_io.load_many_text_files(filePaths)
 
 text_processor = TextProcessor()
 
-for document in files.documentLibrary:
-    files.processedDocLibrary.append(text_processor.preprocessor(document))
+for document in documentLibrary:
+    processedDocLibrary.append(text_processor.preprocessor(document))
 
 ##################################################
-
 #from sklearn.feature_extraction.text import CountVectorizer
 
 processedTextDocuments = []
 
-for document in files.processedDocLibrary:
+for document in processedDocLibrary:
     processedTextDocuments.append(text_processor.stringifyTokenArray(document))
 
 ##create a vocabulary of words, 
@@ -34,7 +32,7 @@ for document in files.processedDocLibrary:
 keyword_extractor = KeyWordExtractor()
 #word_count_vector = keyword_extractor.count_vectorizer.fit_transform(docs)
 
-from sklearn.feature_extraction.text import TfidfTransformer
+#from sklearn.feature_extraction.text import TfidfTransformer
 
 #tfidf_transformer=TfidfTransformer(smooth_idf=True,use_idf=True)
 #tfidf_transformer.fit(word_count_vector)
@@ -78,12 +76,8 @@ from sklearn.feature_extraction.text import TfidfTransformer
 temp_doc_results = []
 sorted_doc_wordcounts = {}
 
-temp_doc_results.append(keyword_extractor.get_highest_word_count(0, processedTextDocuments))
-temp_doc_results.append(keyword_extractor.get_highest_word_count(1, processedTextDocuments))
-temp_doc_results.append(keyword_extractor.get_highest_word_count(2, processedTextDocuments))
-temp_doc_results.append(keyword_extractor.get_highest_word_count(3, processedTextDocuments))
-temp_doc_results.append(keyword_extractor.get_highest_word_count(4, processedTextDocuments))
-temp_doc_results.append(keyword_extractor.get_highest_word_count(5, processedTextDocuments))
+for index in range(len(documentLibrary)):
+    temp_doc_results.append(keyword_extractor.get_highest_word_count(index, processedTextDocuments))
 
 def combine_documents_results(document_results):
     for key in document_results:
@@ -92,19 +86,22 @@ def combine_documents_results(document_results):
 for item in temp_doc_results:
     combine_documents_results(item)
 
-sorted_weight = sorted(sorted_doc_wordcounts.items(), key=lambda x:x[1], reverse = True)
+sorted_doc_wordcounts = sorted(sorted_doc_wordcounts.items(), key=lambda x:x[1], reverse = True)
  
-print(sorted_weight)
+print(sorted_doc_wordcounts)
+
+def get_filename(file_path):
+    return 
 
 
 print("#########################")
+import os
+print(os.path.basename(filePaths[0]))
+
 document_sentences = {}
-document_sentences["doc1"] = text_processor.convert_to_sentences(files.documentLibrary[0])
-document_sentences["doc2"] = text_processor.convert_to_sentences(files.documentLibrary[1])
-document_sentences["doc3"] = text_processor.convert_to_sentences(files.documentLibrary[2])
-document_sentences["doc4"] = text_processor.convert_to_sentences(files.documentLibrary[3])
-document_sentences["doc5"] = text_processor.convert_to_sentences(files.documentLibrary[4])
-document_sentences["doc6"] = text_processor.convert_to_sentences(files.documentLibrary[5])
+for index in range(len(filePaths)):
+    file_name = os.path.basename(filePaths[index])
+    document_sentences[file_name] = text_processor.convert_to_sentences(documentLibrary[index])
 
 
 class Term(object):
@@ -124,7 +121,7 @@ class Term(object):
 
 terms = []
 
-for term in sorted_weight:
+for term in sorted_doc_wordcounts:
     #print(term)
     temp_term = Term(term[0], term[1])
     for key in document_sentences:
