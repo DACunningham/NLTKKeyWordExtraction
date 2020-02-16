@@ -25,6 +25,9 @@
     <Compile Include="FileIO.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="KeyWordExtractor.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="NLTKKeyWordExtraction.py" />
     <Compile Include="TextProcessor.py">
       <SubType>Code</SubType>

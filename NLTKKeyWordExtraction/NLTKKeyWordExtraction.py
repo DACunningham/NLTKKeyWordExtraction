@@ -1,12 +1,7 @@
-#import re
 from FileIO import FileIO
 from TextProcessor import TextProcessor
+from KeyWordExtractor import KeyWordExtractor
 import nltk
-import pandas as pd
-#from nltk.stem import WordNetLemmatizer
-from nltk.stem import PorterStemmer
-from nltk.tokenize.stanford import StanfordTokenizer
-import numpy as np 
 
 ###########################
 # Logic starts here
@@ -25,85 +20,101 @@ for document in files.documentLibrary:
 
 ##################################################
 
-from sklearn.feature_extraction.text import CountVectorizer
+#from sklearn.feature_extraction.text import CountVectorizer
 
-docs = []
+processedTextDocuments = []
 
 for document in files.processedDocLibrary:
-    docs.append(text_processor.stringifyTokenArray(document))
+    processedTextDocuments.append(text_processor.stringifyTokenArray(document))
 
-#create a vocabulary of words, 
-#ignore words that appear in 85% of documents, 
-cv = CountVectorizer(max_df=0.85,min_df=0.10,max_features=10000)
-word_count_vector = cv.fit_transform(docs)
+##create a vocabulary of words, 
+##ignore words that appear in 85% of documents, 
+#cv = CountVectorizer(max_df=0.85,min_df=0.10,max_features=10000)
+keyword_extractor = KeyWordExtractor()
+#word_count_vector = keyword_extractor.count_vectorizer.fit_transform(docs)
 
 from sklearn.feature_extraction.text import TfidfTransformer
 
-tfidf_transformer=TfidfTransformer(smooth_idf=True,use_idf=True)
-tfidf_transformer.fit(word_count_vector)
+#tfidf_transformer=TfidfTransformer(smooth_idf=True,use_idf=True)
+#tfidf_transformer.fit(word_count_vector)
 
-def sort_coo(coo_matrix):
-    tuples = zip(coo_matrix.col, coo_matrix.data)
-    return sorted(tuples, key=lambda x: (x[1], x[0]), reverse=True)
+#def sort_coo(coo_matrix):
+#    tuples = zip(coo_matrix.col, coo_matrix.data)
+#    return sorted(tuples, key=lambda x: (x[1], x[0]), reverse=True)
 
-def extract_topn_from_vector(feature_names, sorted_items, topn=10):
-    """get the feature names and tf-idf score of top n items"""
+#def extract_topn_from_vector(feature_names, sorted_items, topn=10):
+#    """get the feature names and tf-idf score of top n items"""
     
-    #use only topn items from vector
-    sorted_items = sorted_items[:topn]
+#    #use only topn items from vector
+#    sorted_items = sorted_items[:topn]
 
-    score_vals = []
-    feature_vals = []
+#    score_vals = []
+#    feature_vals = []
 
-    for idx, score in sorted_items:
-        fname = feature_names[idx]
+#    for idx, score in sorted_items:
+#        fname = feature_names[idx]
         
-        #keep track of feature name and its corresponding score
-        score_vals.append(round(score, 3))
-        feature_vals.append(feature_names[idx])
+#        #keep track of feature name and its corresponding score
+#        score_vals.append(round(score, 3))
+#        feature_vals.append(feature_names[idx])
 
-    #create a tuples of feature,score
-    #results = zip(feature_vals,score_vals)
-    results= {}
-    for idx in range(len(feature_vals)):
-        results[feature_vals[idx]]=score_vals[idx]
+#    #create a tuples of feature,score
+#    #results = zip(feature_vals,score_vals)
+#    results= {}
+#    for idx in range(len(feature_vals)):
+#        results[feature_vals[idx]]=score_vals[idx]
     
-    return results
+#    return results
 
 
-def get_highest_word_count(documentNumber):
-    sorted_items = sort_coo(word_count_vector[documentNumber].tocoo())
-    #Get feature names (words/n-grams). It is sorted by position in sparse matrix
-    feature_names = cv.get_feature_names()
-    n_grams = extract_topn_from_vector(feature_names,sorted_items,10)
-    print(n_grams)
+#def get_highest_word_count(documentNumber):
+#    sorted_items = sort_coo(word_count_vector[documentNumber].tocoo())
+#    #Get feature names (words/n-grams). It is sorted by position in sparse matrix
+#    feature_names = cv.get_feature_names()
+#    n_grams = extract_topn_from_vector(feature_names,sorted_items,10)
+#    print(n_grams)
 
-get_highest_word_count(0)
-get_highest_word_count(1)
-get_highest_word_count(2)
-get_highest_word_count(3)
-get_highest_word_count(4)
-get_highest_word_count(5)
+sorted_doc_wordcounts = {}
+
+doc1 = keyword_extractor.get_highest_word_count(0, processedTextDocuments)
+doc2 = keyword_extractor.get_highest_word_count(1, processedTextDocuments)
+doc3 = keyword_extractor.get_highest_word_count(2, processedTextDocuments)
+doc4 = keyword_extractor.get_highest_word_count(3, processedTextDocuments)
+doc5 = keyword_extractor.get_highest_word_count(4, processedTextDocuments)
+doc6 = keyword_extractor.get_highest_word_count(5, processedTextDocuments)
+
+for key in doc1:
+    sorted_doc_wordcounts[key] = doc1[key]
+
+for key in doc2:
+    sorted_doc_wordcounts[key] = doc2[key]
+
+for key in doc3:
+    sorted_doc_wordcounts[key] = doc3[key]
+
+for key in doc4:
+    sorted_doc_wordcounts[key] = doc4[key]
+
+for key in doc5:
+    sorted_doc_wordcounts[key] = doc5[key]
+
+for key in doc6:
+    sorted_doc_wordcounts[key] = doc6[key]
+
+sorted_weight = sorted(sorted_doc_wordcounts.items(), key=lambda x:x[1], reverse = True)
+ 
+print(sorted_weight)
 
 
 print("#########################")
-#import nltk.data
-
-#def convert_to_sentence():
-#    fp = open("resources\doc1.txt")
-#    data = fp.read()
-#    sentences = tokenizer.tokenize(data)
-#    return sentences
-#    #print('\n-----\n'.join(sentences))
-
-#tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 sentences = text_processor.convert_to_sentences(files.documentLibrary[0])
 
-for sents in sentences:
-    temp = sents.split()
-    term = "generation"
-    if term in temp:
-        print(sents)
+for term in sorted_doc_wordcounts:
+    print(term)
+    for sents in sentences:
+        #temp = sents.split()
+        if term in sents:
+            print(sents)
 
 ## you only needs to do this once
 #feature_names=cv.get_feature_names()
