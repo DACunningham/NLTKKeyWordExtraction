@@ -74,32 +74,22 @@ from sklearn.feature_extraction.text import TfidfTransformer
 #    n_grams = extract_topn_from_vector(feature_names,sorted_items,10)
 #    print(n_grams)
 
+temp_doc_results = []
 sorted_doc_wordcounts = {}
 
-doc1 = keyword_extractor.get_highest_word_count(0, processedTextDocuments)
-doc2 = keyword_extractor.get_highest_word_count(1, processedTextDocuments)
-doc3 = keyword_extractor.get_highest_word_count(2, processedTextDocuments)
-doc4 = keyword_extractor.get_highest_word_count(3, processedTextDocuments)
-doc5 = keyword_extractor.get_highest_word_count(4, processedTextDocuments)
-doc6 = keyword_extractor.get_highest_word_count(5, processedTextDocuments)
+temp_doc_results.append(keyword_extractor.get_highest_word_count(0, processedTextDocuments))
+temp_doc_results.append(keyword_extractor.get_highest_word_count(1, processedTextDocuments))
+temp_doc_results.append(keyword_extractor.get_highest_word_count(2, processedTextDocuments))
+temp_doc_results.append(keyword_extractor.get_highest_word_count(3, processedTextDocuments))
+temp_doc_results.append(keyword_extractor.get_highest_word_count(4, processedTextDocuments))
+temp_doc_results.append(keyword_extractor.get_highest_word_count(5, processedTextDocuments))
 
-for key in doc1:
-    sorted_doc_wordcounts[key] = doc1[key]
+def combine_documents_results(document_results):
+    for key in document_results:
+        sorted_doc_wordcounts[key] = document_results[key]
 
-for key in doc2:
-    sorted_doc_wordcounts[key] = doc2[key]
-
-for key in doc3:
-    sorted_doc_wordcounts[key] = doc3[key]
-
-for key in doc4:
-    sorted_doc_wordcounts[key] = doc4[key]
-
-for key in doc5:
-    sorted_doc_wordcounts[key] = doc5[key]
-
-for key in doc6:
-    sorted_doc_wordcounts[key] = doc6[key]
+for item in temp_doc_results:
+    combine_documents_results(item)
 
 sorted_weight = sorted(sorted_doc_wordcounts.items(), key=lambda x:x[1], reverse = True)
  
@@ -107,14 +97,21 @@ print(sorted_weight)
 
 
 print("#########################")
-sentences = text_processor.convert_to_sentences(files.documentLibrary[0])
+document_sentences = {}
+document_sentences["doc1"] = text_processor.convert_to_sentences(files.documentLibrary[0])
+document_sentences["doc2"] = text_processor.convert_to_sentences(files.documentLibrary[1])
+document_sentences["doc3"] = text_processor.convert_to_sentences(files.documentLibrary[2])
+document_sentences["doc4"] = text_processor.convert_to_sentences(files.documentLibrary[3])
+document_sentences["doc5"] = text_processor.convert_to_sentences(files.documentLibrary[4])
+document_sentences["doc6"] = text_processor.convert_to_sentences(files.documentLibrary[5])
 
-for term in sorted_doc_wordcounts:
+for term in sorted_weight:
     print(term)
-    for sents in sentences:
-        #temp = sents.split()
-        if term in sents:
-            print(sents)
+    for key in document_sentences:
+        print(key)
+        for sentence in document_sentences[key]:
+            if term[0] in sentence.casefold():
+                print(sentence)
 
 ## you only needs to do this once
 #feature_names=cv.get_feature_names()

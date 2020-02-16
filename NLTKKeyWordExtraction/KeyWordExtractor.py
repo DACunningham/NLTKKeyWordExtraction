@@ -6,7 +6,7 @@ class KeyWordExtractor(object):
     def __init__(self, *args, **kwargs):
         #create a vocabulary of words, 
         #ignore words that appear in 85% of documents, 
-        self.count_vectorizer = CountVectorizer(max_df = 0.85, min_df = 0.10, max_features = 10000)
+        self.count_vectorizer = CountVectorizer(max_df = 0.85, min_df = 1, max_features = 10000)
         return super().__init__(*args, **kwargs)
 
     def sort_coo(self, coo_matrix):
