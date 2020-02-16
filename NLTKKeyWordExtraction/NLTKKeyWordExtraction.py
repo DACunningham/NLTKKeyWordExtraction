@@ -1,5 +1,5 @@
 import re
-
+from FileIO import FileIO
 import nltk
 import pandas as pd
 from nltk.stem import WordNetLemmatizer
@@ -49,34 +49,30 @@ def lemmatizeWords(tokens):
     #print(len(lemmatized_words))
     return lemmatized_words
 
-def loadTextFile(fileLocation):
-    file = open(fileLocation, 'rt', encoding = "utf8")
-    fileText = file.read()
-    file.close()
-    return fileText
+#def loadTextFile(fileLocation):
+#    file = open(fileLocation, 'rt', encoding = "utf8")
+#    fileText = file.read()
+#    file.close()
+#    return fileText
 
 ###########################
 # Logic starts here
 filePaths = ["resources/doc1.txt", "resources/doc2.txt", "resources/doc3.txt", 
              "resources/doc4.txt", "resources/doc5.txt", "resources/doc6.txt" ]
-documentLibrary = []
-processedDocLibrary = []
+#documentLibrary = []
+#processedDocLibrary = []
 
-for filePath in filePaths:
-    documentLibrary.append(loadTextFile(filePath))
+files = FileIO()
+#files.filePaths = filePaths
+files.load_all_files(filePaths)
+#for filePath in filePaths:
+#    documentLibrary.append(loadTextFile(filePath))
 
-for document in documentLibrary:
+for document in files.documentLibrary:
     temp = scrub_words(document)
-    processedDocLibrary.append(lemmatizeWords(temp))
+    files.processedDocLibrary.append(lemmatizeWords(temp))
 
-#print(processedDocLibrary)
-
-#cleaned_words1 = scrub_words(article1)
-#lemmatized_words1 = lemmatizeWords(cleaned_words1)
-
-#cleaned_words2 = scrub_words(article2)
-#lemmatized_words2 = lemmatizeWords(cleaned_words2)
-
+##################################################
 
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -85,7 +81,7 @@ def stringifyTokenArray(tokenArray):
 
 docs = []
 
-for document in processedDocLibrary:
+for document in files.processedDocLibrary:
     docs.append(stringifyTokenArray(document))
 
 ##get the text column 
@@ -167,14 +163,20 @@ get_highest_word_count(4)
 get_highest_word_count(5)
 
 
-###############################
+print("#########################")
 import nltk.data
 
+def convert_to_sentence():
+    fp = open("resources\doc1.txt")
+    data = fp.read()
+    sentences = tokenizer.tokenize(data)
+    return sentences
+    #print('\n-----\n'.join(sentences))
+
 tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-fp = open("resources\doc1.txt")
-data = fp.read()
-sentences = tokenizer.tokenize(data)
-#print('\n-----\n'.join(sentences))
+sentences = convert_to_sentence()
+
+
 
 for sents in sentences:
     temp = sents.split()
