@@ -69,7 +69,7 @@ for document in documentLibrary:
     temp = scrub_words(document)
     processedDocLibrary.append(lemmatizeWords(temp))
 
-print(processedDocLibrary)
+#print(processedDocLibrary)
 
 #cleaned_words1 = scrub_words(article1)
 #lemmatized_words1 = lemmatizeWords(cleaned_words1)
@@ -99,9 +99,18 @@ for document in processedDocLibrary:
 #eliminate stop words
 cv=CountVectorizer(max_df=0.85,min_df=0.10,max_features=10000)
 word_count_vector=cv.fit_transform(docs)
+#test = cv.fit(docs)
+#print(test)
 
 print(word_count_vector.shape)
+#for word in word_count_vector:
+#    print(word)
 #print(list(cv.vocabulary_.keys())[:10])
+#print(cv.vocabulary_)
+#print("-------------------------")
+#for i in word_count_vector:
+#    for j in i:
+#        print()
 
 
 
@@ -143,29 +152,59 @@ def extract_topn_from_vector(feature_names, sorted_items, topn=10):
     return results
 
 
-# you only needs to do this once
-feature_names=cv.get_feature_names()
+def get_highest_word_count(documentNumber):
+    sorted_items = sort_coo(word_count_vector[documentNumber].tocoo())
+    #Get feature names (words/n-grams). It is sorted by position in sparse matrix
+    feature_names = cv.get_feature_names()
+    n_grams = extract_topn_from_vector(feature_names,sorted_items,10)
+    print(n_grams)
 
-# get the document that we want to extract keywords from
-doc=docs[5]
+get_highest_word_count(0)
+get_highest_word_count(1)
+get_highest_word_count(2)
+get_highest_word_count(3)
+get_highest_word_count(4)
+get_highest_word_count(5)
 
-#generate tf-idf for the given document
-tf_idf_vector=tfidf_transformer.transform(cv.transform([doc]))
 
-#sort the tf-idf vectors by descending order of scores
-sorted_items=sort_coo(tf_idf_vector.tocoo())
+###############################
+import nltk.data
 
-#extract only the top n; n here is 10
-keywords=extract_topn_from_vector(feature_names,sorted_items,20)
+tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+fp = open("resources\doc1.txt")
+data = fp.read()
+sentences = tokenizer.tokenize(data)
+#print('\n-----\n'.join(sentences))
 
-# now print the results
-#print("\n=====Title=====")
-#print(docs_title[0])
-#print("\n=====Body=====")
-#print(docs_body[0])
-print("\n===Keywords===")
-for k in keywords:
-    print(k,keywords[k])
+for sents in sentences:
+    temp = sents.split()
+    term = "generation"
+    if term in temp:
+        print(sents)
+
+## you only needs to do this once
+#feature_names=cv.get_feature_names()
+
+## get the document that we want to extract keywords from
+#doc=docs[5]
+
+##generate tf-idf for the given document
+#tf_idf_vector=tfidf_transformer.transform(cv.transform([doc]))
+
+##sort the tf-idf vectors by descending order of scores
+#sorted_items=sort_coo(tf_idf_vector.tocoo())
+
+##extract only the top n; n here is 10
+#keywords=extract_topn_from_vector(feature_names,sorted_items,20)
+
+## now print the results
+##print("\n=====Title=====")
+##print(docs_title[0])
+##print("\n=====Body=====")
+##print(docs_body[0])
+#print("\n===Keywords===")
+#for k in keywords:
+#    print(k,keywords[k])
 
 
 
