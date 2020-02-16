@@ -8,54 +8,6 @@ from nltk.stem import PorterStemmer
 from nltk.tokenize.stanford import StanfordTokenizer
 import numpy as np 
 
-#def scrub_words(text):
-#    """Basic cleaning of texts."""
-
-#    #remove non-ascii and digits
-#    #text=re.sub("(\\W|\\d)","",text)
-#    #print(text)
-#    #split into words
-#    #from nltk.tokenize import word_tokenize
-#    #words = word_tokenize(text)
-#    words = re.split(r'\W+|\d', text)
-#    # Lower case
-#    words = [w.lower() for w in words]
-#    # remove punctuation from each word
-#    #import string
-#    #table = str.maketrans('', '', string.punctuation)
-#    #words = [w.translate(table) for w in words]
-
-#    # filter out stop words
-#    from nltk.corpus import stopwords
-#    stop_words = set(stopwords.words("english"))
-#    file = open("resources/stopwords.txt", 'rt')
-#    fileText = file.read()
-#    file.close()
-#    #fileText = fileText.split()
-#    #stop_words.union(fileText)
-#    stop_words = fileText
-#    words = [w for w in words if not w in stop_words]
-#    #print(len(words))
-#    #remove whitespace
-#    #words = words.strip()
-#    return words
-
-#def lemmatizeWords(tokens):
-#    # init lemmatizer
-#    lemmatizer = WordNetLemmatizer()
-#    #lemmatize trouble variations
-#    lemmatized_words=[lemmatizer.lemmatize(word=word,pos='v') for word in tokens]
-#    #cleaned_stemmed_words=[porter_stemmer.stem(word=word) for word in cleaned_words]
-#    #print(lemmatized_words)
-#    #print(len(lemmatized_words))
-#    return lemmatized_words
-
-#def loadTextFile(fileLocation):
-#    file = open(fileLocation, 'rt', encoding = "utf8")
-#    fileText = file.read()
-#    file.close()
-#    return fileText
-
 ###########################
 # Logic starts here
 filePaths = ["resources/doc1.txt", "resources/doc2.txt", "resources/doc3.txt", 
@@ -64,10 +16,7 @@ filePaths = ["resources/doc1.txt", "resources/doc2.txt", "resources/doc3.txt",
 processedDocLibrary = []
 
 files = FileIO()
-#files.filePaths = filePaths
 files.load_all_files(filePaths)
-#for filePath in filePaths:
-#    documentLibrary.append(loadTextFile(filePath))
 
 text_processor = TextProcessor()
 
@@ -78,48 +27,20 @@ for document in files.documentLibrary:
 
 from sklearn.feature_extraction.text import CountVectorizer
 
-def stringifyTokenArray(tokenArray):
-    return " ".join(tokenArray)
-
 docs = []
 
 for document in files.processedDocLibrary:
-    docs.append(stringifyTokenArray(document))
-
-##get the text column 
-#docs=[processedArticle1, processedArticle2]
-#lemmatized_words1 = " ".join(lemmatized_words1)
-#lemmatized_words2 = " ".join(lemmatized_words2)
-#docs = [lemmatized_words1, lemmatized_words2]
+    docs.append(text_processor.stringifyTokenArray(document))
 
 #create a vocabulary of words, 
 #ignore words that appear in 85% of documents, 
-#eliminate stop words
-cv=CountVectorizer(max_df=0.85,min_df=0.10,max_features=10000)
-word_count_vector=cv.fit_transform(docs)
-#test = cv.fit(docs)
-#print(test)
-
-print(word_count_vector.shape)
-#for word in word_count_vector:
-#    print(word)
-#print(list(cv.vocabulary_.keys())[:10])
-#print(cv.vocabulary_)
-#print("-------------------------")
-#for i in word_count_vector:
-#    for j in i:
-#        print()
-
-
+cv = CountVectorizer(max_df=0.85,min_df=0.10,max_features=10000)
+word_count_vector = cv.fit_transform(docs)
 
 from sklearn.feature_extraction.text import TfidfTransformer
 
 tfidf_transformer=TfidfTransformer(smooth_idf=True,use_idf=True)
 tfidf_transformer.fit(word_count_vector)
-
-#print(tfidf_transformer.idf_)
-
-
 
 def sort_coo(coo_matrix):
     tuples = zip(coo_matrix.col, coo_matrix.data)
@@ -166,19 +87,17 @@ get_highest_word_count(5)
 
 
 print("#########################")
-import nltk.data
+#import nltk.data
 
-def convert_to_sentence():
-    fp = open("resources\doc1.txt")
-    data = fp.read()
-    sentences = tokenizer.tokenize(data)
-    return sentences
-    #print('\n-----\n'.join(sentences))
+#def convert_to_sentence():
+#    fp = open("resources\doc1.txt")
+#    data = fp.read()
+#    sentences = tokenizer.tokenize(data)
+#    return sentences
+#    #print('\n-----\n'.join(sentences))
 
-tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-sentences = convert_to_sentence()
-
-
+#tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+sentences = text_processor.convert_to_sentences(files.documentLibrary[0])
 
 for sents in sentences:
     temp = sents.split()
