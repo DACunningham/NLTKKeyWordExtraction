@@ -1,53 +1,54 @@
-import re
+#import re
 from FileIO import FileIO
+from TextProcessor import TextProcessor
 import nltk
 import pandas as pd
-from nltk.stem import WordNetLemmatizer
+#from nltk.stem import WordNetLemmatizer
 from nltk.stem import PorterStemmer
 from nltk.tokenize.stanford import StanfordTokenizer
 import numpy as np 
 
-def scrub_words(text):
-    """Basic cleaning of texts."""
+#def scrub_words(text):
+#    """Basic cleaning of texts."""
 
-    #remove non-ascii and digits
-    #text=re.sub("(\\W|\\d)","",text)
-    #print(text)
-    #split into words
-    #from nltk.tokenize import word_tokenize
-    #words = word_tokenize(text)
-    words = re.split(r'\W+|\d', text)
-    # Lower case
-    words = [w.lower() for w in words]
-    # remove punctuation from each word
-    #import string
-    #table = str.maketrans('', '', string.punctuation)
-    #words = [w.translate(table) for w in words]
+#    #remove non-ascii and digits
+#    #text=re.sub("(\\W|\\d)","",text)
+#    #print(text)
+#    #split into words
+#    #from nltk.tokenize import word_tokenize
+#    #words = word_tokenize(text)
+#    words = re.split(r'\W+|\d', text)
+#    # Lower case
+#    words = [w.lower() for w in words]
+#    # remove punctuation from each word
+#    #import string
+#    #table = str.maketrans('', '', string.punctuation)
+#    #words = [w.translate(table) for w in words]
 
-    # filter out stop words
-    from nltk.corpus import stopwords
-    stop_words = set(stopwords.words("english"))
-    file = open("resources/stopwords.txt", 'rt')
-    fileText = file.read()
-    file.close()
-    #fileText = fileText.split()
-    #stop_words.union(fileText)
-    stop_words = fileText
-    words = [w for w in words if not w in stop_words]
-    #print(len(words))
-    #remove whitespace
-    #words = words.strip()
-    return words
+#    # filter out stop words
+#    from nltk.corpus import stopwords
+#    stop_words = set(stopwords.words("english"))
+#    file = open("resources/stopwords.txt", 'rt')
+#    fileText = file.read()
+#    file.close()
+#    #fileText = fileText.split()
+#    #stop_words.union(fileText)
+#    stop_words = fileText
+#    words = [w for w in words if not w in stop_words]
+#    #print(len(words))
+#    #remove whitespace
+#    #words = words.strip()
+#    return words
 
-def lemmatizeWords(tokens):
-    # init lemmatizer
-    lemmatizer = WordNetLemmatizer()
-    #lemmatize trouble variations
-    lemmatized_words=[lemmatizer.lemmatize(word=word,pos='v') for word in tokens]
-    #cleaned_stemmed_words=[porter_stemmer.stem(word=word) for word in cleaned_words]
-    #print(lemmatized_words)
-    #print(len(lemmatized_words))
-    return lemmatized_words
+#def lemmatizeWords(tokens):
+#    # init lemmatizer
+#    lemmatizer = WordNetLemmatizer()
+#    #lemmatize trouble variations
+#    lemmatized_words=[lemmatizer.lemmatize(word=word,pos='v') for word in tokens]
+#    #cleaned_stemmed_words=[porter_stemmer.stem(word=word) for word in cleaned_words]
+#    #print(lemmatized_words)
+#    #print(len(lemmatized_words))
+#    return lemmatized_words
 
 #def loadTextFile(fileLocation):
 #    file = open(fileLocation, 'rt', encoding = "utf8")
@@ -60,7 +61,7 @@ def lemmatizeWords(tokens):
 filePaths = ["resources/doc1.txt", "resources/doc2.txt", "resources/doc3.txt", 
              "resources/doc4.txt", "resources/doc5.txt", "resources/doc6.txt" ]
 #documentLibrary = []
-#processedDocLibrary = []
+processedDocLibrary = []
 
 files = FileIO()
 #files.filePaths = filePaths
@@ -68,9 +69,10 @@ files.load_all_files(filePaths)
 #for filePath in filePaths:
 #    documentLibrary.append(loadTextFile(filePath))
 
+text_processor = TextProcessor()
+
 for document in files.documentLibrary:
-    temp = scrub_words(document)
-    files.processedDocLibrary.append(lemmatizeWords(temp))
+    files.processedDocLibrary.append(text_processor.preprocessor(document))
 
 ##################################################
 
